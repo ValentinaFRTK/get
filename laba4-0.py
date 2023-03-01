@@ -5,9 +5,9 @@ GPIO.setmode(GPIO.BCM)
 dac = [24, 25]
 GPIO.setup(dac, GPIO.OUT)
 
-p = GPIO.PWM(24, 1000)
+p = GPIO.PWM(24, 100)
 p2 = GPIO.PWM(25, 100)
-p.start(1)
+p.start(100)
 p2.start(1)
 input('Press return to stop:')   # use raw_input for Python 2
 p.stop()
