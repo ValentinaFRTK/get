@@ -27,6 +27,3 @@ finally:
     print("Работает блок finally")
     GPIO.output(dac, 0)
     GPIO.cleanup()
-
-'''except TypeError() or ValueError():
-    sys.exit()'''
