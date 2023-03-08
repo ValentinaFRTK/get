@@ -1,10 +1,10 @@
 import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)
-dac = [21, 20, 16, 12, 7, 8, 25, 24]
+GPIO.setmode(GPIO.BOARD)
+pwm = [3, 5, 7, 11, 13, 15, 19, 21]
 
-GPIO.setup(dac[0], GPIO.OUT)
-p = GPIO.PWM(dac[0], 100)
-p.start(0)
+GPIO.setup(pwm, GPIO.OUT)
+p = [GPIO.PWM(pwm[i], 100) for i in range(8)]
+for i in range(8): p[i].start(0)
 
 def decimal2binary(value):
 	return [int(element) for element in bin(value)[2:].zfill(8)]
@@ -17,8 +17,8 @@ try:
                 quit()
             else:
                 duty_cycle = int(test)
-                p.start(duty_cycle)
-
+                for i in range(8): p[i].start(duty_cycle) 
+                print("V = ", duty_cycle/100*3.3, "В")
         except (TypeError, ValueError, RuntimeError):
             test = "Неправильный ввод: введите целое число или q для выхода "
             print(test)
@@ -27,5 +27,5 @@ except KeyboardInterrupt:
     quit()
 finally:
     print("Работает блок finally")
-    GPIO.output(dac, 0)
+    GPIO.output(pwm, 0)
     GPIO.cleanup()

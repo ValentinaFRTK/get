@@ -6,17 +6,23 @@ GPIO.setup(dac, GPIO.OUT)
 
 def decimal2binary(value):
 	return [int(element) for element in bin(value)[2:].zfill(8)]
-print("Для выхода нажмите q\n")
+print("Для выхода нажмите Ctrl+C\n")
+p = GPIO.PWM(21, 100)
+
 try:
+    T = int(input("Задайте период треугольного сигнала (с):\n"))
+    t = 0.6/200*T   #60% от Т горит, 40% - не горит
     while(1):
         try: 
-            test = input("Введите целое число от 0 до 255\n")
-            if test == 'q':
-                quit()
-            else:
-                x = int(test)
-                GPIO.output(dac, decimal2binary(x))
-                print("V = ", x/256*3.3, "В")
+            for i in range(100):
+                p.start(i)
+                time.sleep(t)
+            for i in range(100):
+                p.start(100 - i)
+                time.sleep(t)
+            p.stop();    
+            time.sleep(0.4*T)
+                
         except (TypeError, ValueError, RuntimeError):
             test = "Неправильный ввод: введите целое число или q для выхода "
             print(test)
