@@ -1,15 +1,16 @@
 import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BOARD)
-pwm = [3, 5, 7, 11, 13, 15, 19, 21]
+GPIO.setmode(GPIO.BCM)
+'''#pwm = [3, 5, 7, 11, 13, 15, 19, 21]
+pwm = [26, 19, 13, 6, 5, 11, 9, 10]
 
-'''GPIO.setup(pwm, GPIO.OUT)
+GPIO.setup(pwm, GPIO.OUT)
 p = [GPIO.PWM(pwm[i], 100) for i in range(8)]
-for i in range(8): p[i].start(0)'''
+for i in range(8): p[i].start(0)
 
 def decimal2binary(value):
 	return [int(element) for element in bin(value)[2:].zfill(8)]
 print("Для выхода нажмите q\n")
-'''try:
+try:
     while(1):
         try: 
             test = input("Введите коэффициент заполнения (целое число от 0 до 100)\n")
@@ -28,11 +29,13 @@ except KeyboardInterrupt:
 finally:
     print("Работает блок finally")
     GPIO.output(pwm, 0)
-    GPIO.cleanup()'''
+    GPIO.cleanup()
+    
+    '''
 
 
-GPIO.setup(21, GPIO.OUT)
-rc = GPIO.PWM(21, 1000)
+GPIO.setup(22, GPIO.OUT)
+rc = GPIO.PWM(22, 1000)
 
 try:
     while(1):
@@ -52,6 +55,6 @@ except KeyboardInterrupt:
     quit()
 finally:
     print("Работает блок finally")
-    GPIO.output(21, 0)
+    GPIO.output(22, 0)
     GPIO.cleanup()
 

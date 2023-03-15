@@ -1,27 +1,26 @@
+
 import RPi.GPIO as GPIO
+import time
 GPIO.setmode(GPIO.BCM)
-dac = [21, 20, 16, 12, 7, 8, 25, 24]
+dac = [26, 19, 13, 6, 5, 11, 9, 10]
 
 GPIO.setup(dac, GPIO.OUT)
 
 def decimal2binary(value):
 	return [int(element) for element in bin(value)[2:].zfill(8)]
 print("Для выхода нажмите Ctrl+C\n")
-p = GPIO.PWM(21, 100)
 
 try:
     T = int(input("Задайте период треугольного сигнала (с):\n"))
-    t = 0.6/200*T   #60% от Т горит, 40% - не горит
+    t = 1/512*T   
     while(1):
         try: 
-            for i in range(100):
-                p.start(i)
+            for i in range(255):
+                GPIO.output(dac, decimal2binary(i))
                 time.sleep(t)
-            for i in range(100):
-                p.start(100 - i)
+            for i in range(255):
+                GPIO.output(dac, decimal2binary(255 - i))
                 time.sleep(t)
-            p.stop();    
-            time.sleep(0.4*T)
                 
         except (TypeError, ValueError, RuntimeError):
             test = "Неправильный ввод: введите целое число или q для выхода "
