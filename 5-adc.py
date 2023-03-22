@@ -23,7 +23,7 @@ def adc():
         signal = decimal2binary(value) # двоичное число ЦАП
         #voltage = value / levels * maxVoltage 
         GPIO.output(dac, signal)
-        time.sleep(0.01)
+        time.sleep(0.0007)
         comparatorValue = GPIO.input(comparator) # считываем значение 0/1 с компаратора
         if comparatorValue == 0:
             #print("ADC value = {:^3} -> {}, input voltage = {:.2f}".format(value, signal, voltage)) 
