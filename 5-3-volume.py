@@ -24,12 +24,13 @@ def binary2decimal(mass):
     return res
 	
 def adc():
+    #for i in range(8): GPIO.output(leds[7-i], 0);
     podbor = [0, 0, 0, 0, 0, 0, 0, 0]
     for i in range (8):
         podbor[i] = 1
         GPIO.output(dac, podbor)
         time.sleep(0.0007)
-        comparatorValue = GPIO.input(comparator)# считыв1, 1, 1, 1, 1, 1аем значение 0/1 с компаратора
+        comparatorValue = GPIO.input(comparator)# считываем значение 0/1 с компаратора
         if comparatorValue == 0:
             podbor[i] = 0
         else:
@@ -42,7 +43,12 @@ try:
         res = binary2decimal(podb)
         voltage = res / levels * maxVoltage
         print("Digital = {:^3}, input voltage = {:.2f}".format(res, voltage))
-        GPIO.output(leds, podb)
+        
+        x = int(voltage/3.3*8 + 0.5)
+        for i in range(x): GPIO.output(leds[7-i], 1)
+        #time.sleep(0.01)
+        for i in range(x, 8): GPIO.output(leds[7-i], 0);
+        
     '''podb = adc()
     res = binary2decimal(podb)
     voltage = res / levels * maxVoltage
