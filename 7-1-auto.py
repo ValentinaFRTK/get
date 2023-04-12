@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 import time 
-import nympy as np
+import numpy as np
 #-----------------реализация последовательного АЦП
 dac = [26, 19, 13, 6, 5, 11, 9, 10]
 leds = [21, 20, 16, 12, 7, 8, 25, 24]
@@ -8,6 +8,7 @@ bits = len(dac)
 levels = 2**bits
 maxVoltage = 3.3
 troykaModule = 17
+ystanovka = 17
 comparator = 4
 
 GPIO.setmode(GPIO.BCM)
@@ -16,12 +17,11 @@ GPIO.setup(leds, GPIO.OUT)
 GPIO.setup(troykaModule, GPIO.OUT, initial = GPIO.HIGH)
 GPIO.setup(comparator, GPIO.IN)
 
-measured_data = np.arange(0, )
-measured_data_str = [str(item) for item in measured_data]
+measured_data = np.array([]) #---------------------------------------
 
-with open("data.txt", 'w') as file:
-    file.write("\n".join(measured_data_str))
 
+
+#------------------------------------------------------------------
 
 def decimal2binary(value):
     return [int(element) for element in bin(value)[2:].zfill(8)]
@@ -47,20 +47,60 @@ def adc():
         #print(podbor)
     return podbor
 try:
+    GPIO.output(ystanovka, 1)  # кондёр будет заряжаться
+    t1 = time.time()            # фиксируем время начала эксперимента
+
     while(1):
         podb = adc()
-        res = binary2decimal(podb)
-        voltage = res / levels * maxVoltage
-        print("Digital = {:^3}, input voltage = {:.2f}".format(res, voltage))
+        value = binary2decimal(podb) # сохраним отчёт АЦП в переменную
+        voltage = value / levels * maxVoltage
+        print("Digital = {:^3}, input voltage = {:.2f}".format(value, voltage))
         
-        x = int(voltage/3.3*8 + 0.5)
+        x = int(voltage/3.3*8 + 0.5)                    # подача value на leds
         for i in range(x): GPIO.output(leds[7-i], 1)
         #time.sleep(0.01)
-        for i in range(x, 8): GPIO.output(leds[7-i], 0);
+        for i in range(x, 8): GPIO.output(leds[7-i], 0)
+
+        measured_data = np.append(measured_data, value)
+        if (value == 251):
+            break
+
+    GPIO.output(ystanovka, 0)  # кондёр будет разряжаться
+
+    while(1):
+        podb = adc()
+        value = binary2decimal(podb) # сохраним отчёт АЦП в переменную
+        voltage = value / levels * maxVoltage
+        print("Digital = {:^3}, input voltage = {:.2f}".format(value, voltage))
         
+        x = int(voltage/3.3*8 + 0.5)                    # подача value на leds
+        for i in range(x): GPIO.output(leds[7-i], 1)
+        #time.sleep(0.01)
+        for i in range(x, 8): GPIO.output(leds[7-i], 0)
+
+        measured_data = np.append(measured_data, value)
+        if (value == 0):
+            break
+
+    t2 = time.time()
+    measure_time = t2-t1
+    print(measured_data)
+    measured_data_str = [str(item) for item in measured_data]
+    print(measured_data_str)
+    with open("data.txt", 'w') as file:
+        file.write("\n".join(measured_data_str))
+
+    with open("settings.txt", 'w') as file:
+        file.write(str(measure_time)) # длительность эксперимента
+        file.write('\n')
+        file.write(str(3.3/255))  # значение одного разряда в вольтах
+
+
 
 except KeyboardInterrupt:
     print("Нажатие ctrl+c - выход")
+    GPIO.output(dac, 0)
+    GPIO.output(leds, 0)
     quit()
 finally:
     print("Работает блок finally")
